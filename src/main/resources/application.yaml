@@ -1,0 +1,10 @@
+server:
+  port: 8080
+  tomcat:
+    th
+
+spring:
+  application:
+    name: my_api
+  profiles:
+    default: dev
