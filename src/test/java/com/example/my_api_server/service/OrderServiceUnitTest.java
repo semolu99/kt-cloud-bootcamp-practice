@@ -160,21 +160,21 @@ class OrderServiceUnitTest {
                 .hasMessage("재고가 없으므로 주문 불가");
     }
 
-    @Test
-    @DisplayName("[Exception] 주문 시간 날짜 오류 테스트")
-    public void orderTimeException() {
-        //given
-
-        when(productRepo.findAllById(initData.productIds)).thenReturn(List.of(initData.product1, initData.product2));
-        when(memberDBRepo.findById(initData.memberId)).thenReturn(Optional.of(initData.member));
-        when(orderRepo.save(any())).thenAnswer(invocation ->
-                invocation.getArgument(0));
-        //when
-        OrderResponseDto dto = orderService.createOrder(orderCreateDto);
-        //then
-        assertThat(dto).isNotNull();
-
-    }
+//    @Test
+//    @DisplayName("[Exception] 주문 시간 날짜 오류 테스트")
+//    public void orderTimeException() {
+//        //given
+//        OrderCreateDto createDto = new OrderCreateDto(initData.memberId, initData.productIds, initData.counts);
+//        when(productRepo.findAllById(initData.productIds)).thenReturn(List.of(initData.product1, initData.product2));
+//        when(memberDBRepo.findById(initData.memberId)).thenReturn(Optional.of(initData.member));
+//        when(orderRepo.save(any())).thenAnswer(invocation ->
+//                invocation.getArgument(0));
+//        //when
+//        OrderResponseDto dto = orderService.createOrder(orderCreateDto);
+//        //then
+//        assertThat(dto).isNotNull();
+//
+//    }
 
     public class InitData {
         public Long memberId;

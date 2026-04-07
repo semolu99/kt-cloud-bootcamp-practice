@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,10 +84,10 @@ public class OrderServiceIntegrationTest {
 
         List<Long> productIds = getProductIds(products);
 
-        OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+        OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
 
         //when
-        OrderResponseDto retDto = orderService.createOrder(createDto);
+        orderService.createOrder(createDto);
 
         //then
         List<Product> resultProducts = productRepo.findAllById(productIds);
@@ -116,7 +115,7 @@ public class OrderServiceIntegrationTest {
 
             List<Long> productIds = getProductIds(products);
 
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
 
             //when
             OrderResponseDto retDto = orderService.createOrder(createDto);
@@ -137,7 +136,7 @@ public class OrderServiceIntegrationTest {
 
             List<Long> productIds = getProductIds(products);
 
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
 
             //when
             OrderResponseDto retDto = orderService.createOrder(createDto);
@@ -182,7 +181,7 @@ public class OrderServiceIntegrationTest {
             Member savedMember = getSaveMember("1234");
             List<Product> products = getProducts();
             List<Long> productIds = getProductIds(products);
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
             //when
             OrderResponseDto response = orderService.createOrder(createDto);
             //then
@@ -206,7 +205,7 @@ public class OrderServiceIntegrationTest {
             List<Product> products = getProducts(); //상품 저장
             List<Long> productIds = getProductIds(products); //productId 추출 작업
 
-            OrderCreateDto createDto = new OrderCreateDto(12341L, productIds, counts, LocalDateTime.now());
+            OrderCreateDto createDto = new OrderCreateDto(12341L, productIds, counts);
 
             //when
             //then
@@ -224,7 +223,7 @@ public class OrderServiceIntegrationTest {
             List<Product> products = getProducts(); //상품 저장
             List<Long> productIds = List.of(123L, 223L); //없는 product ID
 
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
             //when //then
             assertThatThrownBy(() -> orderService.createOrder(createDto))
                     .isInstanceOf(RuntimeException.class)

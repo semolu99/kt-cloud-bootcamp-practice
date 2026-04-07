@@ -1,6 +1,9 @@
 package com.example.my_api_server.service;
 
-import com.example.my_api_server.entity.*;
+import com.example.my_api_server.entity.Member;
+import com.example.my_api_server.entity.Order;
+import com.example.my_api_server.entity.OrderStatus;
+import com.example.my_api_server.entity.Product;
 import com.example.my_api_server.repo.MemberDBRepo;
 import com.example.my_api_server.repo.OrderRepo;
 import com.example.my_api_server.repo.ProductRepo;
@@ -16,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,26 +36,14 @@ public class OrderService {
         Order order = Order.createOrder(member, dto.orderTime());
 
         List<Product> products = productRepo.findAllById(dto.productId());
-        if (products.size() != dto.productId().size())
-            throw new RuntimeException("존재하지 않는 제품입니다.");
 
-        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
-                .mapToObj(idx -> {
-                    Product product = products.get(idx);
-                    Long orderCount = dto.count().get(idx);
-                    //현재 재고에서 주문 재고를 감했을때 음수이면 예외를 터트린다. (주문막기)
-                    product.buyProductWithStock(orderCount);
+        if (products.size() != dto.productId().size()) throw new RuntimeException("존재하지 않는 제품입니다.");
 
-                    return order.createOrderProduct(orderCount, product);
-                }).toList();
-
-        order.addOrderProducts(orderProducts);
+        order.addOrderProducts(dto.count(), products);
 
         Order savedOrder = orderRepo.save(order);
-
         //entity -> Dto로 변환
-
-        return OrderResponseDto.of(order.getId(), savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
+        return OrderResponseDto.of(savedOrder.getId(), savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW) //낙관락 예시
@@ -71,23 +61,23 @@ public class OrderService {
 
         List<Product> products = productRepo.findAllById(dto.productId());
 
-        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
-                .mapToObj(idx -> {
-                    Product product = products.get(idx);
-                    if (product.getStock() - dto.count().get(idx) < 0) {
-                        throw new RuntimeException("재고가 없으므로 주문 불가");
-                    }
+//        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
+//                .mapToObj(idx -> {
+//                    Product product = products.get(idx);
+//                    if (product.getStock() - dto.count().get(idx) < 0) {
+//                        throw new RuntimeException("재고가 없으므로 주문 불가");
+//                    }
+//
+//                    product.decreaseStock(dto.count().get(idx));
+//
+//                    return OrderProduct.builder()
+//                            .order(order)
+//                            .product(products.get(idx))
+//                            .number(dto.count().get(idx))
+//                            .build();
+//                }).toList();
 
-                    product.decreaseStock(dto.count().get(idx));
-
-                    return OrderProduct.builder()
-                            .order(order)
-                            .product(products.get(idx))
-                            .number(dto.count().get(idx))
-                            .build();
-                }).toList();
-
-        order.addOrderProducts(orderProducts);
+        order.addOrderProducts(dto.count(), products);
 
         Order savedOrder = orderRepo.save(order);
 
@@ -108,23 +98,23 @@ public class OrderService {
                 .build();
         List<Product> products = productRepo.findAllByIdsWithXLock(dto.productId());
 
-        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
-                .mapToObj(idx -> {
-                    Product product = products.get(idx);
-                    if (product.getStock() - dto.count().get(idx) < 0) {
-                        throw new RuntimeException("재고가 없으므로 주문 불가");
-                    }
+//        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
+//                .mapToObj(idx -> {
+//                    Product product = products.get(idx);
+//                    if (product.getStock() - dto.count().get(idx) < 0) {
+//                        throw new RuntimeException("재고가 없으므로 주문 불가");
+//                    }
+//
+//                    product.decreaseStock(dto.count().get(idx));
+//
+//                    return OrderProduct.builder()
+//                            .order(order)
+//                            .product(products.get(idx))
+//                            .number(dto.count().get(idx))
+//                            .build();
+//                }).toList();
 
-                    product.decreaseStock(dto.count().get(idx));
-
-                    return OrderProduct.builder()
-                            .order(order)
-                            .product(products.get(idx))
-                            .number(dto.count().get(idx))
-                            .build();
-                }).toList();
-
-        order.addOrderProducts(orderProducts);
+        order.addOrderProducts(dto.count(), products);
 
         Order savedOrder = orderRepo.save(order);
 
@@ -144,9 +134,6 @@ public class OrderService {
     @Transactional(readOnly = true) //readOnly
     public OrderResponseDto findOrder(Long orderId) {
         Order order = orderRepo.findById(orderId).orElseThrow();
-
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(order.getId(), order.getOrderTime(), order.getOrderStatus(), true);
-
-        return orderResponseDto;
+        return OrderResponseDto.of(order.getId(), order.getOrderTime(), order.getOrderStatus(), true);
     }
 }

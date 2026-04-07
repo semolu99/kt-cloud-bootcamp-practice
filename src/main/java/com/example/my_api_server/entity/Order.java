@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Entity
 @NoArgsConstructor
@@ -44,6 +45,7 @@ public class Order {
     }
 
     public OrderProduct createOrderProduct(Long orderCount, Product product) {
+        product.buyProductWithStock(orderCount);
         return OrderProduct.builder()
                 .order(this)
                 .product(product)
@@ -52,7 +54,11 @@ public class Order {
     }
 
     //양방향 매핑
-    public void addOrderProducts(List<OrderProduct> orderProducts) {
-        this.orderProducts = orderProducts;
+    public void addOrderProducts(List<Long> counts, List<Product> products) {
+
+        this.orderProducts = IntStream.range(0, counts.size())
+                .mapToObj(idx -> {
+                    return this.createOrderProduct(counts.get(idx), products.get(idx));
+                }).toList();
     }
 }
