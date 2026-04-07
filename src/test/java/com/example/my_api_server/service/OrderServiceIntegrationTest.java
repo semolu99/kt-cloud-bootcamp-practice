@@ -3,6 +3,7 @@ package com.example.my_api_server.service;
 import com.example.my_api_server.common.MemberFixture;
 import com.example.my_api_server.common.ProductFixture;
 import com.example.my_api_server.entity.Member;
+import com.example.my_api_server.entity.OrderProduct;
 import com.example.my_api_server.entity.Product;
 import com.example.my_api_server.repo.MemberDBRepo;
 import com.example.my_api_server.repo.OrderProductRepo;
@@ -67,6 +68,33 @@ public class OrderServiceIntegrationTest {
 
     private List<Product> getProducts() {
         return productRepo.saveAll(ProductFixture.defaultProducts());
+    }
+
+    @Test
+    @DisplayName("주문 생성 시 ")
+    public void createOrderStockDecreaseSuccess() {
+        //given
+        List<Long> counts = List.of(1L, 2L);
+
+        Member savedMember = getSaveMember("1234");
+
+        List<Product> products = getProducts();
+
+        List<Long> productIds = getProductIds(products);
+
+        OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+
+        //when
+        OrderResponseDto retDto = orderService.createOrder(createDto, LocalDateTime.now());
+
+        //then
+        List<Product> resultProducts = productRepo.findAllById(productIds);
+        for (int i = 0; i < products.size(); i++) {
+            Product beforeProduct = products.get(i);
+            Product nowProduct = resultProducts.get(i);
+            Long orderStock = counts.get(i);
+            assertThat(beforeProduct.getStock() - orderStock).isEqualTo(nowProduct.getStock());
+        }
     }
 
     @Nested
@@ -141,6 +169,24 @@ public class OrderServiceIntegrationTest {
             assertThatThrownBy(() -> orderService.createOrder(createDto, LocalDateTime.now()))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("재고가 없으므로 주문 불가");
+        }
+
+        @Test
+        @DisplayName("주문 생성 시 상품 주문 개수와 저장된 값이 같다.")
+        public void createOrderSameCount() {
+            //given
+            List<Long> counts = List.of(5L, 6L);
+            Member savedMember = getSaveMember("1234");
+            List<Product> products = getProducts();
+            List<Long> productIds = getProductIds(products);
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+            //when
+            OrderResponseDto response = orderService.createOrder(createDto, LocalDateTime.now());
+            //then
+            List<OrderProduct> orderProducts = orderProductRepo.findAllByOrderId(response.getOrderId());
+            assertThat(orderProducts)
+                    .extracting(OrderProduct::getNumber)
+                    .containsExactlyElementsOf(counts);
         }
 
 

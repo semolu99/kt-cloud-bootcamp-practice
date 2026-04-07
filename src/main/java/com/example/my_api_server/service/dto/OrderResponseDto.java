@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderResponseDto {
     //주문완료 시간, 주문 상태, 주문성공여부
+    private Long orderId;
+
     private LocalDateTime orderCompletedTime;
 
     private OrderStatus orderStatus;

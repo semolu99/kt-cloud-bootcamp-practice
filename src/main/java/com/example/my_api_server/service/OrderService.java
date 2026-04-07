@@ -51,7 +51,7 @@ public class OrderService {
 
         //entity -> Dto로 변환
 
-        return OrderResponseDto.of(savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
+        return OrderResponseDto.of(order.getId(), savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW) //낙관락 예시
@@ -89,7 +89,7 @@ public class OrderService {
 
         Order savedOrder = orderRepo.save(order);
 
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
+        OrderResponseDto orderResponseDto = OrderResponseDto.of(order.getId(), savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
 
         return orderResponseDto;
     }
@@ -127,7 +127,7 @@ public class OrderService {
         Order savedOrder = orderRepo.save(order);
 
         //entity -> Dto로 변환
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
+        OrderResponseDto orderResponseDto = OrderResponseDto.of(order.getId(), savedOrder.getOrderTime(), OrderStatus.COMPLETED, true);
 
         return orderResponseDto;
     }
@@ -143,7 +143,7 @@ public class OrderService {
     public OrderResponseDto findOrder(Long orderId) {
         Order order = orderRepo.findById(orderId).orElseThrow();
 
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(order.getOrderTime(), order.getOrderStatus(), true);
+        OrderResponseDto orderResponseDto = OrderResponseDto.of(order.getId(), order.getOrderTime(), order.getOrderStatus(), true);
 
         return orderResponseDto;
     }

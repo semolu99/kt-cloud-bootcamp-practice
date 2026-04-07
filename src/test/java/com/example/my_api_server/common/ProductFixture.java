@@ -18,7 +18,7 @@ public class ProductFixture {
                 .productName("티셔츠 1")
                 .productType(ProductType.CLOTHES)
                 .price(1000L)
-                .stock(1L)
+                .stock(10L)
                 .build();
 
         Product product2 = Product.builder()
@@ -26,7 +26,7 @@ public class ProductFixture {
                 .productName("티셔츠 2")
                 .productType(ProductType.CLOTHES)
                 .price(2000L)
-                .stock(2L)
+                .stock(20L)
                 .build();
 
         return List.of(product1, product2);
