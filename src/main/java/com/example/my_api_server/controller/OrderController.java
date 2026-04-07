@@ -17,7 +17,7 @@ public class OrderController {
 
     @PostMapping
     public OrderResponseDto createOrder(@Validated @RequestBody OrderCreateDto dto) {
-        return orderService.CreateOrderOptLock(dto);
+        return orderService.CreateOrderPLock(dto);
     }
 
     @GetMapping("/{id}")
