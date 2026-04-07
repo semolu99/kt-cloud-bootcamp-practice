@@ -15,11 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -94,7 +94,7 @@ class OrderServiceUnitTest {
         when(orderRepo.save(any())).thenAnswer(invocation ->
                 invocation.getArgument(0));
         //when
-        OrderResponseDto dto = orderService.createOrder(orderCreateDto, LocalDateTime.now());
+        OrderResponseDto dto = orderService.createOrder(orderCreateDto);
         //then
         ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
         verify(orderRepo).save(captor.capture()); //orderRepo save()가 호출되는지 확인
@@ -155,7 +155,7 @@ class OrderServiceUnitTest {
         //when
 
         //then
-        assertThatThrownBy(() -> orderService.createOrder(createDto, LocalDateTime.now()))
+        assertThatThrownBy(() -> orderService.createOrder(createDto))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("재고가 없으므로 주문 불가");
     }
@@ -170,7 +170,7 @@ class OrderServiceUnitTest {
         when(orderRepo.save(any())).thenAnswer(invocation ->
                 invocation.getArgument(0));
         //when
-        OrderResponseDto dto = orderService.createOrder(orderCreateDto, LocalDateTime.now());
+        OrderResponseDto dto = orderService.createOrder(orderCreateDto);
         //then
         assertThat(dto).isNotNull();
 

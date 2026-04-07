@@ -85,10 +85,10 @@ public class OrderServiceIntegrationTest {
 
         List<Long> productIds = getProductIds(products);
 
-        OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+        OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
 
         //when
-        OrderResponseDto retDto = orderService.createOrder(createDto, LocalDateTime.now());
+        OrderResponseDto retDto = orderService.createOrder(createDto);
 
         //then
         List<Product> resultProducts = productRepo.findAllById(productIds);
@@ -116,10 +116,10 @@ public class OrderServiceIntegrationTest {
 
             List<Long> productIds = getProductIds(products);
 
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
 
             //when
-            OrderResponseDto retDto = orderService.createOrder(createDto, LocalDateTime.now());
+            OrderResponseDto retDto = orderService.createOrder(createDto);
 
             //then
             assertThat(retDto.getOrderCompletedTime()).isNotNull();
@@ -137,10 +137,10 @@ public class OrderServiceIntegrationTest {
 
             List<Long> productIds = getProductIds(products);
 
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
 
             //when
-            OrderResponseDto retDto = orderService.createOrder(createDto, LocalDateTime.now());
+            OrderResponseDto retDto = orderService.createOrder(createDto);
 
             //then
             List<Product> resultProducts = productRepo.findAllById(productIds);
@@ -156,7 +156,7 @@ public class OrderServiceIntegrationTest {
         @DisplayName("주문 생성 시 재고가 부족하면 예외가 정상 작동한다.")
         public void createOrderStockValidation() {
             //given
-            List<Long> counts = List.of(10L, 10L);
+            List<Long> counts = List.of(100L, 100L);
 
             Member savedMember = getSaveMember("1234");
 
@@ -169,7 +169,7 @@ public class OrderServiceIntegrationTest {
             //when
 
             //then
-            assertThatThrownBy(() -> orderService.createOrder(createDto, LocalDateTime.now()))
+            assertThatThrownBy(() -> orderService.createOrder(createDto))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("재고가 없으므로 주문 불가");
         }
@@ -182,9 +182,9 @@ public class OrderServiceIntegrationTest {
             Member savedMember = getSaveMember("1234");
             List<Product> products = getProducts();
             List<Long> productIds = getProductIds(products);
-            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
             //when
-            OrderResponseDto response = orderService.createOrder(createDto, LocalDateTime.now());
+            OrderResponseDto response = orderService.createOrder(createDto);
             //then
             List<OrderProduct> orderProducts = orderProductRepo.findAllByOrderId(response.getOrderId());
             assertThat(orderProducts)
@@ -206,13 +206,29 @@ public class OrderServiceIntegrationTest {
             List<Product> products = getProducts(); //상품 저장
             List<Long> productIds = getProductIds(products); //productId 추출 작업
 
-            OrderCreateDto createDto = new OrderCreateDto(12341L, productIds, counts);
+            OrderCreateDto createDto = new OrderCreateDto(12341L, productIds, counts, LocalDateTime.now());
 
             //when
             //then
-            assertThatThrownBy(() -> orderService.createOrder(createDto, LocalDateTime.now()))
+            assertThatThrownBy(() -> orderService.createOrder(createDto))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("회원이 존재하지 않습니다.");
+        }
+
+        @Test
+        @DisplayName("주문 시 존재하지 않는 상품에 대해서 예외가 발생한다.")
+        public void validateProductWhenCreateOrder() {
+            //given
+            List<Long> counts = List.of(1L, 1L);
+            Member savedMember = getSaveMember("1234"); //멤버 저장
+            List<Product> products = getProducts(); //상품 저장
+            List<Long> productIds = List.of(123L, 223L); //없는 product ID
+
+            OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts, LocalDateTime.now());
+            //when //then
+            assertThatThrownBy(() -> orderService.createOrder(createDto))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("존재하지 않는 제품입니다.");
         }
     }
 }
