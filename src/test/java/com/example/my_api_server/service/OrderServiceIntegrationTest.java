@@ -2,6 +2,7 @@ package com.example.my_api_server.service;
 
 import com.example.my_api_server.common.MemberFixture;
 import com.example.my_api_server.common.ProductFixture;
+import com.example.my_api_server.config.TestContainerConfig;
 import com.example.my_api_server.entity.Member;
 import com.example.my_api_server.entity.OrderProduct;
 import com.example.my_api_server.entity.Product;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@Import(TestContainerConfig.class)
 @ActiveProfiles("test")
 public class OrderServiceIntegrationTest {
 
