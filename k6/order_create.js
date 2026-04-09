@@ -3,7 +3,7 @@ import {check, sleep} from 'k6';
 
 export const options = {
     // 테스트 설정 (예: 10명이 30초 동안 반복 호출)
-    vus: 1500,
+    vus: 3000,
     duration: '30s',
     thresholds: { //SLA(Service Level Agreement) 준수: 서비스가 보장해야 하는 최소한의 속도를 강제할 수 있음
         // 1. 응답 시간 기준: 95%의 요청이 2000ms(2초) 이내여야 함
@@ -22,8 +22,8 @@ export default function () {
 
     // DTO 구조에 맞춘 페이로드 설정
     const payload = JSON.stringify({
-        memberId: 145,
-        productId: [232, 233], // 리스트 형태
+        memberId: 1,
+        productId: [1, 2], // 리스트 형태
         count: [1, 1],           // 리스트 형태
         orderTime: new Date().toISOString(), // LocalDateTime 형식에 대응
     });
