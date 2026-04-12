@@ -10,7 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 public class MemberSignUpListener {
 
-    @Async
+    @Async("ioExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendNotification(MemberSignUpEvent event) {
         log.info("member ID = {}", event.getId());
